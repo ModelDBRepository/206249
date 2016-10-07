@@ -1,0 +1,38 @@
+This is the model used in 
+
+ Kastellakis G, Silva AJ, Poirazi P.,  (2016) Linking memories across time via neuronal and dendritic overlaps in model neurons 
+with active dendrites. Cell Reports (accepted)
+
+
+Instructions:
+
+To make the main model binary:
+
+	% make lamodel
+
+To run the simulations used in the paper
+
+	% bash  run_all.sh
+
+
+The data analysis requires Matlab version R2014a  or newer
+To generate all the graphs, run the matlab script make_graphs.m
+The graphs will be placed in the ./figs subdirectory
+
+The main is licensed under the  GPLv3 license (see LICENSE).
+
+The matlab code makes use of the open source exportfig matlab package (see exportfig/LICENSE for details ).
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
