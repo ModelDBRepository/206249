@@ -1,8 +1,8 @@
 This is the model used in 
 
- Kastellakis G, Silva AJ, Poirazi P.,  (2016) Linking memories across time via neuronal and dendritic overlaps in model neurons 
-with active dendrites. Cell Reports (accepted)
-
+Kastellakis G, Silva AJ, Poirazi P., (2016) Linking memories across
+time via neuronal and dendritic overlaps in model neurons with active
+dendrites. Cell Reports
 
 Instructions:
 
@@ -36,3 +36,5 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+20161007 Changes to allgraphs.m, make_graphs.m, run_2strong.sh, and
+run_btag.sh supplied by George Kastellakis.

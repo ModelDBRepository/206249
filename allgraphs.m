@@ -1,10 +1,11 @@
 
-results = containers.Map();
+figsdir = './figs/'
+results = containers.Map()
 
 % strong2 weakstrong sparse repeated multi
 
 close all
-% #analyze='sparse';
+%analyze='strong2';
 
 if (strcmp(analyze,'sparse'))
     
@@ -19,6 +20,7 @@ if (strcmp(analyze,'sparse'))
     bars_act = [];
 
     CONDITION='sparse';
+    %CONDITION='Nsparse';
     an_stats
     
     brssum = brsyns;
@@ -53,6 +55,7 @@ if (strcmp(analyze,'sparse'))
     csus = csusafter;
 
     CONDITION='sparseL';
+    %CONDITION='NsparseL';
     an_stats
     local_csus = csusafter;
     local_brssum = brsyns;
@@ -77,9 +80,9 @@ if (strcmp(analyze,'sparse'))
         tr(2, i) = trevrolls(brws(i,:))
     end
     
-    
-        
+
     CONDITION='sparseG';
+    %CONDITION='NsparseG';
     an_stats
     global_csus = csusafter;
     global_brssum = brsyns;
@@ -108,22 +111,21 @@ if (strcmp(analyze,'sparse'))
     barwitherr(errs, bars);
     %set(h(3), 'facecolor', 'g');
     set(gcf, 'Position', [0,0, 400,300])
-    ylabel('Total synaptic weight')
+    title('Total synaptic weight')
     %ylabel('Total Synaptic Weight')
     %ylim([0,3000]);
-    xlim([0,5])
     set(gca, 'XTickLabel', {'Pre', 'Somatic', 'Local','S&L' })
-    export_fig(sprintf('./figs/sparisty_sumweights.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparisty_sumweights.pdf', figsdir), '-transparent')
 
 
     nextplot(1,1);
     set(gcf, 'Position', [0,0, 400, 300])
     barwitherr( bars_sp(:,2)', bars_sp(:,1)');
     %bar([kpre, kpost]);
-    ylabel(sprintf('Population firing sparseness'))
+    title(sprintf('Population firing sparseness'))
     %ylim([0.4,0.8]);
     set(gca, 'XTickLabel', {'Pre', 'Somatic', 'Local','S&L'})
-    export_fig(sprintf('./figs/sparse_sp.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_sp.pdf', figsdir), '-transparent')
     ACT_CUTOFF=5;
     
     nextplot(1,1);
@@ -148,19 +150,19 @@ if (strcmp(analyze,'sparse'))
 
     %h = barwitherr( [std(cbars); std(bars)]', [mean(cbars); mean(bars)]');
     h = barwitherr( std(cbars), mean(cbars));
-    ylabel(sprintf('Avg Firing Rate (Hz)'))
+    title(sprintf('Avg Firing Rate (Hz)'))
     %ylim([0.4,0.8]);
     %set(h(2), 'facecolor', [0.7, 0.82,0.9]); 
     %bar([kpre, kpost]);
     %ylim([0,40]);
     %legend('Coding neurons', 'Active neurons')
     set(gca, 'XTickLabel', {'Pre', 'Somatic', 'Local','S&L'})
-    export_fig(sprintf('./figs/sparse_ff.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_ff.pdf', figsdir), '-transparent')
 
     
     ant = bars; % [anpre anpostG anpostL anpostB];
-    [p, tbl, stats] = anova1(ant)
-    [res,means] = multcompare(stats,'CType','bonferroni')
+    %%[p, tbl, stats] = anova1(ant)
+    %%[res,means] = multcompare(stats,'CType','bonferroni')
     
 
     nextplot(1,1);
@@ -177,14 +179,13 @@ if (strcmp(analyze,'sparse'))
     bars = bars_act(1:4,1);
     errs = bars_act(1:4,2);
     h=barwitherr( errs, bars) ; %bars_act(1:4,2)', bars_act(1:4,1)');
-
     %set(h(2), 'facecolor', [0.7, 0.82,0.9]); 
     %bar([kpre, kpost]);
-    ylabel('Coding neurons (%)')
+    title('Coding neurons (%)')
     %ylim([0,40]);
     %legend('Coding neurons', 'Active neurons')
     set(gca, 'XTickLabel', { 'Pre', 'Somatic', 'Local','S&L'})
-    export_fig(sprintf('./figs/sparse_act.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_act.pdf', figsdir), '-transparent')
 
     
     anpre = 100*sum(global_actppre>10,2)/400;
@@ -192,8 +193,8 @@ if (strcmp(analyze,'sparse'))
     anpostL = 100*sum(local_actppost>10,2)/400;
     anpostB = 100*sum(both_actppost>10,2)/400;
     ant = [anpre anpost anpostL anpostB];
-    [p, tbl, stats] = anova1(ant);
-    [res,means] = multcompare(stats,'CType','bonferroni');
+    %%[p, tbl, stats] = anova1(ant);
+    %%[res,means] = multcompare(stats,'CType','bonferroni');
     
 
     
@@ -208,24 +209,35 @@ if (strcmp(analyze,'sparse'))
    
     barwitherr( me, mm);
     title(('Avg potentiated synapses per branch'))
-    ylim([0,5]);
-    ylabel('Number of synapses');
+   %ylim([0,5]);
+    ylabel('# Synapses');
     set(gca, 'XTickLabel', { 'Somatic', 'Local', 'S&L'})
-    export_fig(sprintf('./figs/sparse_syn_per_branch.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_syn_per_branch.pdf', figsdir), '-transparent')
     
     
     
     sg = global_brssum(global_brssum>0);
     sl= local_brssum(local_brssum>0);
     sb= brssum(brssum>0);
-    sall = [sg' sl' sb'];
-    lab = [repmat(1,1,length(sg)) repmat(2,1,length(sl)) repmat(3,1,length(sb)) ];
-    boxplot(sall, lab, 'Labels', {'Somatic', 'Local', 'S&L'}, 'colorgroup', lab)
-    ylabel('Potentiated synapses per branch')
-    export_fig(sprintf('./figs/BOX_BRALLOC.pdf'), '-transparent')
-    [p, tbl, stats] = kruskalwallis(sall, lab)
     
-    [res,means] = multcompare(stats,'CType','bonferroni')
+    sg = sg(1:500);
+    sl = sl(1:500);
+    sb = sb(1:500);
+    
+    sall = [sg' sl' sb'];
+    
+    %sall = [sb'  sg'];
+    lab = [repmat(1,1,length(sb)) repmat(2,1,length(sg)) repmat(3,1,length(sb)) ];
+    %[p, tbl, stats] = kruskalwallis(sall, lab)
+    
+    boxplot(sall, lab, 'Labels', {'Somatic', 'Local', 'S&L'}, 'colorgroup', lab)
+    ylabel('# potentiated synapses per branch')
+    %export_fig(sprintf('%s/BOX_BRALLOC.pdf', figsdir), '-transparent')
+  
+    
+    %return;
+    
+    %%[res,means] = multcompare(stats,'CType','bonferroni')
       
     nextplot(1,1)
     
@@ -234,33 +246,37 @@ if (strcmp(analyze,'sparse'))
     
     me = [ std(global_nrnssum(global_nrnssum>0)), std(local_nrnssum(local_nrnssum>0)), std(nrnssum(nrnssum>0))]/10.;
     mm = [ mean(global_nrnssum(global_nrnssum>0)), mean(local_nrnssum(local_nrnssum>0)),  mean(nrnssum(nrnssum>0))];
+
     
-    
-  
-    
-    
-   
     h=barwitherr( me, mm);
     title(('Avg potentiated synapses per neuron'))
     %ylim([0.2,1.0]);
-    ylabel('Number of synapses');
+    ylabel('# Synapses');
     set(gca, 'XTickLabel', { 'Somatic', 'Local', 'S&L'})
-    export_fig(sprintf('./figs/sparse_syn_per_neuron.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_syn_per_neuron.pdf', figsdir), '-transparent')
     
       
     sall = [];
-    sg = global_nrnssum(:); %; (global_nrnssum>0);
-    sl= local_nrnssum(:); % (local_nrnssum>0);
-    sb= nrnssum(:); %(nrnssum>0);
-    sall = [sg sl sb];
-    sall(sall==0) = NaN;
+    sg = global_nrnssum(global_nrnssum>0);
+    sl= local_nrnssum(local_nrnssum>0);
+    sb= nrnssum(nrnssum>0);
+    %sall = [sg' sl' sb'];
+    %lab = [repmat(1,1,length(sg)) repmat(2,1,length(sl)) repmat(3,1,length(sb)) ];
+     
+    %sg = sg(1:20);
+    %sl = sl(1:20);
+    %sb = sb(1:20);
+    
+    sall = [sg' sl' sb'];
+    %sall = [sg'  sl'];
     lab = [repmat(1,1,length(sg)) repmat(2,1,length(sl)) repmat(3,1,length(sb)) ];
-    
+    [p, tbl, stats] = kruskalwallis(sall, lab)
+     
     boxplot(sall, lab, 'Labels', {'Somatic', 'Local', 'S&L'}, 'colorgroup', lab)
-    ylabel('Potentiated synapses per neuron')
-    export_fig(sprintf('./figs/BOX_NRNALLOC.pdf'), '-transparent')
+    ylabel('# potentiated synapses per neuron')
+    export_fig(sprintf('%s/BOX_NRNALLOC.pdf', figsdir), '-transparent')
+
     
-    sall = sall(:);
     [p, tbl, stats] = kruskalwallis(sall, lab)
     [res,means] = multcompare(stats,'CType','bonferroni')
     
@@ -272,17 +288,17 @@ if (strcmp(analyze,'sparse'))
     ss = 100*ss/(npyrs);
     barwitherr( ss, ms);
     title(('Neurons with at least 1 synapse'))
-    %ylim([0.2,1.0]);
+
     ylabel('% Neurons');
     set(gca, 'XTickLabel', { 'Somatic', 'Local', 'S&L'})
-    export_fig(sprintf('./figs/sparse_nrn_alloc.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_nrn_alloc.pdf', figsdir), '-transparent')
     
     sg = sum(global_nrnssum>0,2);
     sl= sum(local_nrnssum>0,2);
     sb= sum(nrnssum>0,2);
     sall = [sg sl sb];
     %lab = [repmat(1,1,length(sg)) repmat(2,1,length(sl)) repmat(3,1,length(sb)) ];
-    [p, tbl, stats] = anova1(sall)
+    %%[p, tbl, stats] = anova1(sall)
     [res,means] = multcompare(stats,'CType','bonferroni')
     
     
@@ -295,9 +311,9 @@ if (strcmp(analyze,'sparse'))
     barwitherr( ss, ms);
     title(('Total potentiated synapses'))
     %ylim([0.2,1.0]);
-    ylabel('Potentiated Synapses');
+    ylabel('# Potentiated Synapses');
     set(gca, 'XTickLabel', { 'Somatic', 'Local', 'S&L'})
-    export_fig(sprintf('./figs/sparse_total_syns.pdf'), '-transparent')
+    export_fig(sprintf('%s/sparse_total_syns.pdf', figsdir), '-transparent')
     
     
     
@@ -313,12 +329,7 @@ if (strcmp(analyze,'sparse'))
     %ylim([0.2,1.0]);
     ylabel('# CS/US clusters');
     set(gca, 'XTickLabel', { 'S&L', 'Local'})
-    export_fig(sprintf('./figs/sparse_csus.pdf'), '-transparent')
-    
-    
-
-    
-    
+    export_fig(sprintf('%s/sparse_csus.pdf', figsdir), '-transparent')
 end
 
 
@@ -372,7 +383,7 @@ end
 if (strcmp(analyze,'weakstrong'))
     
     results = containers.Map();
-CONDAR={'weakstrong','weakstrongN'}
+CONDAR={'weakstrongN','weakstrong'}
 for kk=1:2
      COND= CONDAR{kk}  %'weakstrongN';
 
@@ -419,8 +430,7 @@ for kk=1:2
     rotateXLabels(gca, 60)
     
     ylim([0,30])
-    ylabel(sprintf('Coding Neurons (%%)', CONDITION));
-    xlabel('Interval between strong and weak memory');
+    title(sprintf('Coding Neurons (%%)', CONDITION));
     
     xlim([0,9])
     export_fig(sprintf('./figs/WS_act_%s.pdf', COND), '-transparent')
@@ -457,7 +467,6 @@ for kk=1:2
     ylabel('Coding Neurons (%)'); 
     title('Strong memory')
     xlim([0,9])
-    xlabel('Interval between strong and weak memory');
     export_fig(sprintf('./figs/WS_act_strong_%s.pdf', COND), '-transparent')
         
     figure;
@@ -477,11 +486,9 @@ for kk=1:2
     set(gca, 'XTick', [1:length(diffs)])
     set(gca, 'XTickLabel', difflabels)
     rotateXLabels(gca, 60)
-    
 
-    ylabel('Avg Firing Frequency (Hz)'); 
+    title('Avg Firing Frequency (Hz)'); 
     xlim([0,9])
-    xlabel('Interval between strong and weak memory');
     export_fig(sprintf('./figs/WS_ff_%s.pdf', COND), '-transparent')
 
 
@@ -513,10 +520,9 @@ for kk=1:2
     rotateXLabels(gca, 60)
     ylim([0,100]);
 
-    %('Correlation'); 
-    ylabel('Firing rate vector correlation')
+    ylabel('Correlation'); 
+    title('Firing rate vector correlation')
     xlim([0,9])
-    xlabel('Interval between strong and weak memory');
     export_fig(sprintf('./figs/WS_firingcor_%s.pdf', COND), '-transparent')
     
     
@@ -541,9 +547,8 @@ for kk=1:2
     ylim([0,100]);
 
     ylabel('Common neurons (%)'); 
-    %title('Common recruited neurons ')
+    title('Common recruited neurons ')
     xlim([0,9])
-    xlabel('Interval between strong and weak memory');
     export_fig(sprintf('./figs/WS_coract_%s.pdf', COND), '-transparent')
 
  
@@ -566,8 +571,8 @@ for kk=1:2
     set(gca, 'XTick', [1:length(diffs)])
     set(gca, 'XTickLabel', difflabels)
     rotateXLabels(gca, 60);
-    ylabel('Correlation');
-    title('Correlation of synaptic projection patterns per branch')
+    ylabel('Similarity');
+    title('Similarity of synaptic projection patterns per branch')
     ylim([0,.6]);
     xlim([0,9])
     export_fig(sprintf('./figs/WS_brcor_%s.pdf', COND), '-transparent')
@@ -592,8 +597,8 @@ for kk=1:2
     set(gca, 'XTick', [1:length(diffs)])
     set(gca, 'XTickLabel', difflabels)
     rotateXLabels(gca, 60);
-    ylabel('Correlation');
-    title('Correlation of synaptic projection patterns per neuron')
+    ylabel('Similarity');
+    title('Similarity of synaptic projection patterns per neuron')
     %ylim([=,.8]);
     xlim([0,9])
     export_fig(sprintf('./figs/WS_nrncor_%s.pdf', COND), '-transparent')
@@ -617,10 +622,9 @@ for kk=1:2
     
     rotateXLabels(gca, 60)
     ylim([0,50]);
-    %title('% Branches with clusters of both memories'); 
-    ylabel('% Branches with clusters of both memories')
+    title('% Branches with clusters of both memories'); 
+    ylabel('% Branches')
     xlim([0,9])
-     xlabel('Interval between strong and weak memory');
     export_fig(sprintf('./figs/WS_brcommon_%s.pdf', COND), '-transparent')
     
     
@@ -636,9 +640,8 @@ for kk=1:2
     rotateXLabels(gca, 60)
     ylim([0,900]);
     xlim([0,13])
-    ylabel('Branches containing the weak memory'); 
-    %ylabel('# branches')
-     xlabel('Interval between strong and weak memory');
+    title('Number of branches containing the weak memory'); 
+    ylabel('# branches')
     export_fig(sprintf('./figs/WS_brtsyns_%s.pdf', COND), '-transparent')
     
     
@@ -654,9 +657,8 @@ for kk=1:2
     rotateXLabels(gca, 60)
     ylim([0,600]);
     xlim([0,13])
-    ylabel('Neurons containing the weak memory'); 
-    %ylabel('# neurons')
-    xlabel('Interval between strong and weak memory');
+    title('Number of neurons containing the weak memory'); 
+    ylabel('# neurons')
     export_fig(sprintf('./figs/WS_nrntsyns_%s.pdf', COND), '-transparent')
     
 
@@ -682,19 +684,19 @@ end
 if (strcmp(analyze,'strong2'))
     close all
 
-    CONDITION='strong2NL'
+    CONDITION='strong2L'
     strong2
     local_brcommon = brcommon;
     local_totactive= totactive;
     local_totcommon = totcommon;
 
-    CONDITION='strong2NG'
+    CONDITION='strong2G'
     strong2
     global_brcommon = brcommon;
     global_totactive= totactive;
     global_totcommon = totcommon;
 
-    CONDITION='strong2N'
+    CONDITION='strong2'
     strong2
 
     
@@ -722,12 +724,11 @@ if (strcmp(analyze,'strong2'))
 
         set(gca, 'XTick', [1:length(diffs)])
         set(gca, 'XTickLabel', difflabels)
-        ylabel('% Active neurons');
+        title('% Active neurons');
         %xlabel('Weak-Strong Interval [minutes]')
         ylim([10,50])
         export_fig(sprintf('./figs/%s_ACT%d.pdf',CONDITION, NMEM), '-transparent')
     end
-
 
     
 
@@ -736,20 +737,20 @@ if (strcmp(analyze,'strong2'))
         hold on
         tt = totactive(:,:,NMEM)
         dt = bsxfun(@rdivide, bsxfun(@minus, tt, tt(:,4)), tt(:,4))
-        errorbar(100*mean(dt), 100*stderr(dt), 'b')
+        errorbar(100*mean(dt), NMEM*100*stderr(dt), 'b')
 
         tt = local_totactive(:,:,NMEM)
         dt = bsxfun(@rdivide, bsxfun(@minus, tt, tt(:,4)), tt(:,4))
-        errorbar(100*mean(dt), 100*stderr(dt), 'r')
+        errorbar(100*mean(dt), NMEM*100*stderr(dt), 'r')
 
         tt = global_totactive(:,:,NMEM)
         dt = bsxfun(@rdivide, bsxfun(@minus, tt, tt(:,4)), tt(:,4))
-        errorbar(100*mean(dt), 100*stderr(dt), 'g')
+        errorbar(100*mean(dt), NMEM*100*stderr(dt), 'g')
         hold off
 
         set(gca, 'XTick', [1:length(diffs)])
         set(gca, 'XTickLabel', difflabels)
-        ylabel('Increase in Coding Neurons (%)');
+        title('Increase in Coding Neurons (%)');
         %xlabel('Weak-Strong Interval [minutes]')
         ylim([0,100])
         export_fig(sprintf('./figs/%s_increase%d.pdf',CONDITION, NMEM), '-transparent')
@@ -764,9 +765,10 @@ if (strcmp(analyze,'strong2'))
     set(gca, 'XTickLabel', difflabels)
     set(h(2), 'facecolor', [0.5,0.0,0]);
     set(h(1), 'facecolor', [0,0.5,0.0]);    
-    set(h(3), 'facecolor', [0,0.,0.5]);    
-    ylabel(sprintf('Common Coding Neurons (%%) %s', CONDITION))
-    %ylabel('% common neurons')
+    set(h(3), 'facecolor', [0,0.0,0.5]);
+    
+    title(sprintf('Common Coding Neurons (%%) %s', CONDITION))
+    ylabel('% common neurons')
     %xlabel('Weak-Strong Interval [minutes]')
     ylim([0,50])
     export_fig(sprintf('./figs/%s_common.pdf',CONDITION), '-transparent')
@@ -779,16 +781,133 @@ if (strcmp(analyze,'strong2'))
     h=barwitherr(bm', be');
     set(h(2), 'facecolor', [0.5,0.0,0]);
     set(h(1), 'facecolor', [0,0.5,0.0]);    
-    set(h(3), 'facecolor', [0,0.,0.5]);       
+    set(h(3), 'facecolor', [0,0.0,0.5]);    
+    
     set(gca, 'XTick', [1:length(diffs)])
     set(gca, 'XTickLabel', difflabels)
-    ylabel('% Branches with clusters of both memories')
-    %ylabel('% branches')
+    title('% Branches with clusters of both memories')
+    ylabel('% branches')
     %xlabel('Weak-Strong Interval [minutes]')
     ylim([0,50])
     export_fig(sprintf('./figs/%s_brcommon.pdf',CONDITION), '-transparent')
 
 end
+
+
+
+if (strcmp(analyze,'dir'))
+    close all
+    
+    DIRS = {'dir1', 'dir2'};
+    for ddir =1:length(DIRS)
+        dir = DIRS{ddir};
+        
+        CONDITION=[ dir 'L']
+        dir2
+        local_brcommon = brcommon;
+        local_totactive= totactive;
+        local_totcommon = totcommon;
+        
+        CONDITION= [dir 'G']
+        dir2
+        global_brcommon = brcommon;
+        global_totactive= totactive;
+        global_totcommon = totcommon;
+        
+        CONDITION= dir
+        dir2
+        
+        close all
+        
+        for NMEM=1:2
+            
+            figure;
+            hold on
+            mact = 100.0*mean(totactive,1)
+            sact = 100.0*std(totactive,0,1)/(sqrt(nruns))
+            %errorbar(mact(:,:,1), sact(:,:,1), 'b.');
+            errorbar(mact(:,:,NMEM), sact(:,:,NMEM), 'b');
+            
+            mact = 100.0*mean(local_totactive,1)
+            sact = 100.0*std(local_totactive,0,1)/(sqrt(nruns))
+            %errorbar(mact(:,:,1), sact(:,:,1), COL);
+            errorbar(mact(:,:,NMEM), sact(:,:,NMEM), 'r');
+            
+            mact = 100.0*mean(global_totactive,1)
+            sact = 100.0*std(global_totactive,0,1)/(sqrt(nruns))
+            %errorbar(mact(:,:,1), sact(:,:,1), COL);
+            errorbar(mact(:,:,NMEM), sact(:,:,NMEM), 'g');
+            hold off
+            
+            set(gca, 'XTick', [1:length(diffs)])
+            set(gca, 'XTickLabel', difflabels)
+            title('% Active neurons');
+            %xlabel('Weak-Strong Interval [minutes]')
+            ylim([0,70])
+            export_fig(sprintf('./figs/%s_ACT%d.pdf',CONDITION, NMEM), '-transparent')
+        end
+        
+        for NMEM=1:2
+            figure
+            hold on
+            tt = totactive(:,:,NMEM)
+            dt = bsxfun(@rdivide, bsxfun(@minus, tt, tt(:,4)), tt(:,4))
+            errorbar(100*mean(dt), 100*stderr(dt), 'b')
+            
+            tt = local_totactive(:,:,NMEM)
+            dt = bsxfun(@rdivide, bsxfun(@minus, tt, tt(:,4)), tt(:,4))
+            errorbar(100*mean(dt), 100*stderr(dt), 'r')
+            
+            tt = global_totactive(:,:,NMEM)
+            dt = bsxfun(@rdivide, bsxfun(@minus, tt, tt(:,4)), tt(:,4))
+            errorbar(100*mean(dt), 100*stderr(dt), 'g')
+            hold off
+            
+            set(gca, 'XTick', [1:length(diffs)])
+            set(gca, 'XTickLabel', difflabels)
+            title('Increase in Coding Neurons (%)');
+            %xlabel('Weak-Strong Interval [minutes]')
+            ylim([0,100])
+            export_fig(sprintf('./figs/%s_increase%d.pdf',CONDITION, NMEM), '-transparent')
+        end
+        
+        figure
+        bm = [100.*std(global_totcommon)/(sqrt(nruns)); 100.*std(local_totcommon)/(sqrt(nruns)); 100.*std(totcommon)/(sqrt(nruns)) ];
+        be = [100.*mean(global_totcommon); 100.*mean(local_totcommon) ; 100.*mean(totcommon)];
+        
+        h=barwitherr(bm', be');
+        set(gca, 'XTick', [1:length(diffs)])
+        set(gca, 'XTickLabel', difflabels)
+        set(h(2), 'facecolor', [0.5,0.0,0]);
+        set(h(1), 'facecolor', [0,0.5,0.0]);
+        
+        title(sprintf('Common Coding Neurons (%%) %s', CONDITION))
+        ylabel('% common neurons')
+        %xlabel('Weak-Strong Interval [minutes]')
+        ylim([0,80])
+        export_fig(sprintf('./figs/%s_common.pdf',CONDITION), '-transparent')
+        
+        
+        figure
+        bm = [100.*std(global_brcommon)/(sqrt(nruns)); 100.*std(local_brcommon)/(sqrt(nruns));; 100.*std(brcommon)/(sqrt(nruns)) ];
+        be = [100.*mean(global_brcommon);  100.*mean(local_brcommon); 100.*mean(brcommon)];
+        
+        h=barwitherr(bm', be');
+        set(h(2), 'facecolor', [0.5,0.0,0]);
+        set(h(1), 'facecolor', [0,0.5,0.0]);
+        
+        set(gca, 'XTick', [1:length(diffs)])
+        set(gca, 'XTickLabel', difflabels)
+        title('% Branches with clusters of both memories')
+        ylabel('% branches')
+        %xlabel('Weak-Strong Interval [minutes]')
+        ylim([0,50])
+        export_fig(sprintf('./figs/%s_brcommon.pdf',CONDITION), '-transparent')
+    end
+end
+
+
+
 
 
 if (strcmp(analyze, 'three'))   
@@ -824,72 +943,36 @@ end
 
 
 if (strcmp(analyze, 'multi'))
-    ISIs =[60,300,1440];
-    CASES = {'multiG','multiL','multiGN', 'multiLN'};
-    ovl = zeros(length(ISIs), length(CASES), 8);
-    ovl_err = zeros(length(ISIs), length(CASES), 8);
-    brs_err = zeros(length(ISIs), length(CASES), 8);
-    brs = zeros(length(ISIs), length(CASES), 8);
+    CONDITION='multiG'
+    COL='g'
+    multistats
+    global_mm = mm;
+    i=3
+    cors = sum(m .* tril(circshift(eye(npatterns), i)));
+    global_cors = cors(1:npatterns-i);
     
-    for is=1:length(ISIs)
+    
+    COL='r'
+    CONDITION='multiL'
+    multistats
+    
+    local_mm = mm;
+    i=3
+    cors = sum(m .* tril(circshift(eye(npatterns), i)));
+    local_cors = cors(1:npatterns-i);
+    
+    aa = [global_cors' local_cors']
+    anova1(aa)
+    
+    COL='b'
+    CONDITION='multiGN'
+    multistats
+    globalN_mm = mm;
         
-        ISI = ISIs(is)
-        for cs=1:length(CASES)
-            CONDITION=CASES{cs}
-            COL='b';
-            multistats
-            %global_mm = mm;
-            %i=3
-            %cors = sum(m .* tril(circshift(eye(npatterns), i)));
-            %global_cors = cors(1:npatterns-i);
-            ovl(is, cs,:) = bars_ovl;
-            ovl_err(is,cs,:) = bars_err;
-            brs(is,cs,:) = brovl_mean;
-            brs_err(is,cs,:) = brovl_err;
-        end
-    end
-    
-    ISIdesc = {'1 Hour', '5 Hours', '24 Hours'};
-    
-    close all
-    for i=1:length(ISIs)
-       figure;
-       hold on
-       errorbar(squeeze(ovl(i,1,:)), squeeze(ovl_err(i,1,:)), 'go-');
-       errorbar(squeeze(ovl(i,2,:)), squeeze(ovl_err(i,2,:)), 'ro-');
-       errorbar(squeeze(ovl(i,3,:)), squeeze(ovl_err(i,3,:)), 'c--');
-       errorbar(squeeze(ovl(i,4,:)), squeeze(ovl_err(i,4,:)), 'm--');
-       hold off;
-       title(sprintf('ISI %s', ISIdesc{i}))
-       xlim([0,9]);
-       ylim([0,70]);
-       xlabel('Distance between memories');
-       ylabel('% Overlapping population');
-       if (i==3)
-        legend({'Somatic', 'Local', 'Somatic without exc.', 'Local without exc.'})
-       end
-       export_fig(sprintf('./figs/MULT_%d_ovl.pdf',i), '-transparent')
-    end
-    
-    
-    for i=1:length(ISIs)
-       figure;
-       hold on
-       errorbar(squeeze(brs(i,1,:)), squeeze(brs_err(i,1,:)), 'go-');
-       errorbar(squeeze(brs(i,2,:)), squeeze(brs_err(i,2,:)), 'ro-');
-       errorbar(squeeze(brs(i,3,:)), squeeze(brs_err(i,3,:)), 'c--');
-       errorbar(squeeze(brs(i,4,:)), squeeze(brs_err(i,4,:)), 'm--');
-       hold off;
-       title(sprintf('ISI %s', ISIdesc{i}))
-       xlim([0,9]);
-       ylim([0,40]);
-       xlabel('Distance between memories');
-       ylabel('% branches with clusters of both memories');
-       if (i==3)
-        legend({'Somatic', 'Local', 'Somatic without exc.', 'Local without exc.'})
-       end
-       export_fig(sprintf('./figs/MULT_%d_brs.pdf',i), '-transparent')
-    end
+    COL='r'
+    CONDITION='multiLN'
+    localN_mm = mm;
+    multistats
 end
 
 
